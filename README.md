@@ -66,6 +66,31 @@ be cloned directly into `custom_nodes` because it has a root loader.
   still embeds the queued workflow/prompt normally; live selection is not written
   back into that already-queued prompt as a reproducible manual index.
 
+## RunPod portrait starter
+
+`scripts/setup_runpod_portrait.py` uses the running ComfyUI API (default port
+3000) to check installed nodes and model menus before changing files. Run it
+from this complete repository checkout with an idle queue. It locates the running
+ComfyUI process, backs up the existing package outside `custom_nodes`, updates
+our four package files, and adds a new timestamped workflow through `/userdata`.
+It does not queue images or restart the server. Use `--dry-run` to check first,
+`--root /path/to/ComfyUI` if process discovery fails, or `--user ID` for multi-user
+servers. Existing workflows are preserved. Restart ComfyUI and refresh afterward.
+
+The separate `examples/Phluffhead_TwoPerson_Portrait_SeedVR2.json` is an experimental
+fully clothed portrait starter. Select two reference images before queuing. Two
+single-image samplers feed the interactive selector; the selected base and its
+SeedVR2 upscale are both saved. The new Release Models Before Upscale node passes
+images through unchanged while unloading ComfyUI-managed models and clearing its
+cache to make VRAM available to the external upscaler.
+
+Defaults target a 24 GB GPU: roughly 1 MP generation, SeedVR2 3B FP8, tiled VAE,
+CPU offloading, and 1536 px short edge capped at 2048 px long edge. This is not a
+verified VRAM guarantee. SeedVR2 may download weights on first use. Reference
+slots remain asymmetric; this graph does not turn them into separate identity
+embeddings or guarantee better likeness. Compare the saved base and upscale.
+The example has not yet been executed on a real ComfyUI GPU installation.
+
 ## Verification
 
 Backend tests (no models/GPU required):

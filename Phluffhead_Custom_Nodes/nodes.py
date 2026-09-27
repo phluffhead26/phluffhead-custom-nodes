@@ -15,6 +15,28 @@ from server import PromptServer
 from .selector_state import selections
 
 
+class ReleaseModels:
+    """Release ComfyUI-managed model VRAM before an external upscaler runs."""
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"images": ("IMAGE",)}}
+
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "release"
+    CATEGORY = "Phluffhead"
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("nan")
+
+    def release(self, images):
+        model_management.throw_exception_if_processing_interrupted()
+        model_management.unload_all_models()
+        model_management.soft_empty_cache()
+        return (images,)
+
+
 def write_previews(images, directory):
     """Small, temporary PNGs only; output always uses the original tensor."""
     results = []
